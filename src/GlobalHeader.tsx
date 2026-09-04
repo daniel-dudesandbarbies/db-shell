@@ -38,6 +38,20 @@ export interface GlobalHeaderProps {
  * vlevo otevírá drawer s nav položkami, logo uprostřed, UserMenu vpravo
  * zůstává vždy viditelné.
  */
+// Musí sedět s .db-shell__spin's animation-duration ve styles.css.
+const SPIN_CYCLE_MS = 800
+// I když appka odpoví za pár ms, ikonka se aspoň 2-3x celá otočí - jinak by
+// rychlý refresh vypadal jako trhnutí/blik místo plynulé animace.
+const MIN_SPIN_CYCLES = 3
+
+async function withMinSpinDuration<T>(promise: Promise<T>): Promise<T> {
+  const [result] = await Promise.all([
+    promise,
+    new Promise((resolve) => setTimeout(resolve, SPIN_CYCLE_MS * MIN_SPIN_CYCLES)),
+  ])
+  return result
+}
+
 export function GlobalHeader({ logoHref, logoSrc, navItems, user, onSignOut, adminHref, onRefresh }: GlobalHeaderProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -72,7 +86,7 @@ export function GlobalHeader({ logoHref, logoSrc, navItems, user, onSignOut, adm
     if (!onRefresh || refreshing) return
     setRefreshing(true)
     try {
-      await onRefresh()
+      await withMinSpinDuration(Promise.resolve(onRefresh()))
     } finally {
       setRefreshing(false)
     }
