@@ -1,0 +1,234 @@
+/*
+ * @db/shell's GlobalHeader styles. Barvy přes @db/design-tokens - obsah na
+ * růžové (--db-color-accent) je VŽDY --db-color-on-accent (definované tam,
+ * nezávisí na dark módu), na rozdíl od --db-color-fg/ink, který se s dark
+ * módem překlápí.
+ */
+
+@import '@db/design-tokens/tokens.css';
+
+.db-shell {
+  background: var(--db-color-accent);
+  color: var(--db-color-on-accent);
+  font-family: var(--db-font-body, inherit);
+  position: relative;
+  z-index: 100;
+}
+
+.db-shell__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  min-height: 56px;
+}
+
+.db-shell__hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--db-color-on-accent);
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.db-shell__logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.db-shell__logo img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.db-shell__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.db-shell__nav-item {
+  color: var(--db-color-on-accent);
+  opacity: 0.75;
+  text-decoration: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  padding: 8px 10px;
+}
+
+.db-shell__nav-item:hover,
+.db-shell__nav-item--active {
+  opacity: 1;
+}
+
+.db-shell__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.db-shell__icon-btn {
+  background: none;
+  border: none;
+  color: var(--db-color-on-accent);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.db-shell__icon-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@keyframes db-shell-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.db-shell__spin {
+  animation: db-shell-spin 0.8s linear infinite;
+}
+
+.db-shell__user {
+  position: relative;
+}
+
+.db-shell__avatar {
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid var(--db-color-on-accent);
+  border-radius: 0;
+  background: transparent;
+  color: var(--db-color-on-accent);
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+}
+
+.db-shell__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.db-shell__dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--db-color-bg);
+  color: var(--db-color-fg);
+  border: 1px solid var(--db-color-border);
+  min-width: 220px;
+  max-width: calc(100vw - 32px);
+  z-index: 200;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.db-shell__dropdown-name {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--db-color-border);
+}
+
+.db-shell__dropdown-primary {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.db-shell__dropdown-secondary {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--db-color-muted);
+  overflow-wrap: anywhere;
+}
+
+.db-shell__dropdown-item {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--db-color-fg);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.db-shell__dropdown-item:hover {
+  background: var(--db-color-border);
+}
+
+.db-shell__drawer {
+  display: none;
+  flex-direction: column;
+  padding: 4px 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.db-shell__drawer-item {
+  color: var(--db-color-on-accent);
+  text-decoration: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 14px;
+  padding: 12px 10px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.db-shell__drawer-item--active {
+  opacity: 1;
+}
+
+/* Mobile: hide inline nav, show hamburger + drawer instead. Matches the
+   monorepo's md=768px breakpoint convention (packages/ui's responsive
+   baseline). */
+@media (max-width: 767px) {
+  .db-shell__nav {
+    display: none;
+  }
+
+  .db-shell__hamburger {
+    display: flex;
+  }
+
+  .db-shell__logo {
+    margin: 0 auto;
+  }
+
+  .db-shell__drawer {
+    display: flex;
+  }
+}
