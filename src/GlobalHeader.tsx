@@ -272,20 +272,18 @@ export function GlobalHeader({
                   {initials}
                 </span>
               ) : (
-                <span
-                  className={`db-shell__avatar-content db-shell__spinner-dots${avatarAnim ? ` db-shell__avatar-content--${avatarAnim}` : ''}`}
-                  role="status"
-                  aria-label="Obnovuji"
-                >
-                  <span className="db-shell__spinner-dot" />
-                  <span className="db-shell__spinner-dot" />
-                  <span className="db-shell__spinner-dot" />
-                  <span className="db-shell__spinner-dot" />
-                  <span className="db-shell__spinner-dot db-shell__spinner-dot--center" />
-                  <span className="db-shell__spinner-dot" />
-                  <span className="db-shell__spinner-dot" />
-                  <span className="db-shell__spinner-dot" />
-                  <span className="db-shell__spinner-dot" />
+                <span className={avatarAnim ? `db-shell__avatar-content db-shell__avatar-content--${avatarAnim}` : 'db-shell__avatar-content'}>
+                  <span className="db-shell__spinner-dots" role="status" aria-label="Obnovuji">
+                    <span className="db-shell__spinner-dot" />
+                    <span className="db-shell__spinner-dot" />
+                    <span className="db-shell__spinner-dot" />
+                    <span className="db-shell__spinner-dot" />
+                    <span className="db-shell__spinner-dot db-shell__spinner-dot--center" />
+                    <span className="db-shell__spinner-dot" />
+                    <span className="db-shell__spinner-dot" />
+                    <span className="db-shell__spinner-dot" />
+                    <span className="db-shell__spinner-dot" />
+                  </span>
                 </span>
               )}
             </button>
