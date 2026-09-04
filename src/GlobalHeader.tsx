@@ -41,18 +41,19 @@ export interface GlobalHeaderProps {
  * vlevo otevírá drawer s nav položkami, logo uprostřed, UserMenu vpravo
  * zůstává vždy viditelné.
  */
-// Musí sedět s .db-shell__spin's animation-duration ve styles.css.
-const SPIN_CYCLE_MS = 800
-// I když appka odpoví za pár ms, ikonka se aspoň 2-3x celá otočí - jinak by
-// rychlý refresh vypadal jako trhnutí/blik místo plynulé animace.
-const MIN_SPIN_CYCLES = 3
+// Časování refresh animace - ikona "vlétne" do avataru, ten převezme
+// tečkový spinner, po dokončení se obojí vrátí. Musí sedět s příslušnými
+// animation-duration/transition hodnotami ve styles.css.
+const FLY_MS = 460 // let ikony do středu avataru (zrychlující se, "vtažení")
+const POP_OUT_MS = 160 // zmizení iniciál/spinneru před výměnou
+const POP_IN_MS = 330 // návrat iniciál + ikony na místo (s "poskočením")
+// I když appka odpoví za pár ms, spinner musí být vidět aspoň jeden celý
+// puls (db-spinner-pulse běží 1.8s) - jinak by to vypadalo jako bezdůvodné
+// škubnutí místo skutečného načítání.
+const MIN_HOLD_MS = 1800
 
-async function withMinSpinDuration<T>(promise: Promise<T>): Promise<T> {
-  const [result] = await Promise.all([
-    promise,
-    new Promise((resolve) => setTimeout(resolve, SPIN_CYCLE_MS * MIN_SPIN_CYCLES)),
-  ])
-  return result
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /**
@@ -82,8 +83,15 @@ export function GlobalHeader({
 }: GlobalHeaderProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [refreshing, setRefreshing] = useState(false)
+  // 'idle' celou dobu kromě refresh animace - avatar i refresh tlačítko
+  // jsou po tu dobu disabled, ať uživatel nerozklikne menu/refresh znovu
+  // uprostřed běžící sekvence.
+  const [refreshPhase, setRefreshPhase] = useState<'idle' | 'flying' | 'spinning' | 'restoring'>('idle')
+  const [avatarShowing, setAvatarShowing] = useState<'initials' | 'spinner'>('initials')
+  const [avatarAnim, setAvatarAnim] = useState<'' | 'pop-out' | 'pop-in'>('')
   const menuRef = useRef<HTMLDivElement>(null)
+  const refreshIconRef = useRef<HTMLSpanElement>(null)
+  const avatarRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -110,13 +118,74 @@ export function GlobalHeader({
   }, [drawerOpen])
 
   const handleRefresh = async () => {
-    if (!onRefresh || refreshing) return
-    setRefreshing(true)
-    try {
-      await withMinSpinDuration(Promise.resolve(onRefresh()))
-    } finally {
-      setRefreshing(false)
+    if (!onRefresh || refreshPhase !== 'idle') return
+
+    const iconEl = refreshIconRef.current
+    const avatarEl = avatarRef.current
+    const start = Date.now()
+    const refreshPromise = Promise.resolve(onRefresh())
+
+    if (!iconEl || !avatarEl) {
+      // Bez obou prvků nejde spočítat, kam ikona "letí" - appka refresh
+      // aspoň provede, jen bez vizuální choreografie.
+      await refreshPromise
+      return
     }
+
+    // --- 1. Ikona "vlétne" do středu avataru ---
+    setRefreshPhase('flying')
+
+    const iconRect = iconEl.getBoundingClientRect()
+    const avatarRect = avatarEl.getBoundingClientRect()
+    const dx = avatarRect.left + avatarRect.width / 2 - (iconRect.left + iconRect.width / 2)
+    const dy = avatarRect.top + avatarRect.height / 2 - (iconRect.top + iconRect.height / 2)
+
+    iconEl.style.position = 'fixed'
+    iconEl.style.left = `${iconRect.left}px`
+    iconEl.style.top = `${iconRect.top}px`
+    iconEl.style.width = `${iconRect.width}px`
+    iconEl.style.height = `${iconRect.height}px`
+    iconEl.classList.add('db-shell__refresh-icon--flying')
+    // vynutí reflow, ať se fixed pozice "usadí" před spuštěním transition
+    void iconEl.offsetHeight
+    iconEl.style.transform = `translate(${dx}px, ${dy}px) scale(0) rotate(540deg)`
+
+    await wait(FLY_MS)
+
+    // --- 2. Avatar přebírá tečkový spinner ---
+    setRefreshPhase('spinning')
+    setAvatarAnim('pop-out')
+    await wait(POP_OUT_MS)
+    setAvatarShowing('spinner')
+    setAvatarAnim('pop-in')
+
+    const elapsed = Date.now() - start
+    await Promise.all([refreshPromise, wait(Math.max(MIN_HOLD_MS - elapsed, 0))])
+
+    // --- 3. Návrat: spinner mizí, iniciály i ikona se vrátí ---
+    setRefreshPhase('restoring')
+    setAvatarAnim('pop-out')
+    await wait(POP_OUT_MS)
+    setAvatarShowing('initials')
+    setAvatarAnim('pop-in')
+
+    iconEl.classList.remove('db-shell__refresh-icon--flying')
+    iconEl.style.position = ''
+    iconEl.style.left = ''
+    iconEl.style.top = ''
+    iconEl.style.width = ''
+    iconEl.style.height = ''
+    iconEl.style.transform = ''
+    iconEl.classList.add('db-shell__refresh-icon--hidden')
+    // vynutí reflow před pop-in, ať naskočí z nuly, ne z předchozí transformace
+    void iconEl.offsetHeight
+    iconEl.classList.remove('db-shell__refresh-icon--hidden')
+    iconEl.classList.add('db-shell__refresh-icon--pop-in')
+
+    await wait(POP_IN_MS)
+    iconEl.classList.remove('db-shell__refresh-icon--pop-in')
+    setAvatarAnim('')
+    setRefreshPhase('idle')
   }
 
   const displayName = user.fullName || user.email || '?'
@@ -171,32 +240,54 @@ export function GlobalHeader({
               type="button"
               className="db-shell__icon-btn"
               onClick={handleRefresh}
-              disabled={refreshing}
+              disabled={refreshPhase !== 'idle'}
               aria-label="Obnovit"
               title="Obnovit"
             >
-              <svg
-                viewBox="0 0 20 20"
-                width="18"
-                height="18"
-                fill="none"
-                aria-hidden="true"
-                className={refreshing ? 'db-shell__spin' : undefined}
-              >
-                <path
-                  d="M16.5 10a6.5 6.5 0 1 1-2.1-4.8M16.5 3v4h-4"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <span ref={refreshIconRef} className="db-shell__refresh-icon">
+                <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true">
+                  <path
+                    d="M16.5 10a6.5 6.5 0 1 1-2.1-4.8M16.5 3v4h-4"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
             </button>
           )}
 
           <div className="db-shell__user" ref={menuRef}>
-            <button type="button" className="db-shell__avatar" onClick={() => setMenuOpen((v) => !v)} title={displayName}>
-              {initials}
+            <button
+              type="button"
+              ref={avatarRef}
+              className="db-shell__avatar"
+              onClick={() => setMenuOpen((v) => !v)}
+              disabled={refreshPhase !== 'idle'}
+              title={displayName}
+            >
+              {avatarShowing === 'initials' ? (
+                <span className={avatarAnim ? `db-shell__avatar-content db-shell__avatar-content--${avatarAnim}` : 'db-shell__avatar-content'}>
+                  {initials}
+                </span>
+              ) : (
+                <span
+                  className={`db-shell__avatar-content db-shell__spinner-dots${avatarAnim ? ` db-shell__avatar-content--${avatarAnim}` : ''}`}
+                  role="status"
+                  aria-label="Obnovuji"
+                >
+                  <span className="db-shell__spinner-dot" />
+                  <span className="db-shell__spinner-dot" />
+                  <span className="db-shell__spinner-dot" />
+                  <span className="db-shell__spinner-dot" />
+                  <span className="db-shell__spinner-dot db-shell__spinner-dot--center" />
+                  <span className="db-shell__spinner-dot" />
+                  <span className="db-shell__spinner-dot" />
+                  <span className="db-shell__spinner-dot" />
+                  <span className="db-shell__spinner-dot" />
+                </span>
+              )}
             </button>
             {menuOpen && (
               <div className="db-shell__dropdown">

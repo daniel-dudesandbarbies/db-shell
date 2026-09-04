@@ -18,6 +18,16 @@
   z-index: 100;
 }
 
+/* Mobilní Safari/Chrome kreslí na tap vlastní tmavý "tap highlight" overlay
+   NEZÁVISLE na :hover/:active CSS - žádná námi psaná barva ho nepřebije,
+   dokud ho explicitně nevypneme. Nespoléhat na zdědění z <html> (Tailwind
+   preflight ho tam sice nastavuje, ale form-control prvky jako <button> ho
+   v praxi nezdědí spolehlivě) - vypnout přímo na každém klikatelném prvku. */
+.db-shell button,
+.db-shell a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .db-shell__row {
   display: flex;
   align-items: center;
@@ -128,14 +138,47 @@
   cursor: default;
 }
 
-@keyframes db-shell-spin {
+/* Refresh animace: ikona "vlétne" do avataru (fixed pozice + transform
+   dopočítaný v JS z getBoundingClientRect, viz GlobalHeader.tsx), pak se
+   vrátí zpátky - --flying nastaví jen fixed layout, samotný transform
+   (translate/scale/rotate) i jeho transition-timing appka řídí inline. */
+.db-shell__refresh-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+}
+
+.db-shell__refresh-icon--flying {
+  z-index: 250;
+  pointer-events: none;
+  transition: transform 0.46s cubic-bezier(0.55, 0, 0.85, 0.35);
+}
+
+.db-shell__refresh-icon--hidden {
+  opacity: 0;
+}
+
+.db-shell__refresh-icon--pop-in {
+  animation: db-shell-pop-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes db-shell-pop-out {
   to {
-    transform: rotate(360deg);
+    transform: scale(0);
+    opacity: 0;
   }
 }
 
-.db-shell__spin {
-  animation: db-shell-spin 0.8s linear infinite;
+@keyframes db-shell-pop-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .db-shell__user {
@@ -145,6 +188,7 @@
 .db-shell__avatar {
   appearance: none;
   -webkit-appearance: none;
+  position: relative;
   width: 40px;
   height: 40px;
   border: none;
@@ -159,13 +203,73 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  overflow: hidden;
   padding: 0;
   transition: background 0.15s ease;
 }
 
 .db-shell__avatar:hover {
   background: rgba(255, 255, 255, 0.16);
+}
+
+.db-shell__avatar:disabled {
+  cursor: default;
+}
+
+.db-shell__avatar-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+}
+
+.db-shell__avatar-content--pop-out {
+  animation: db-shell-pop-out 0.16s ease-in both;
+}
+
+.db-shell__avatar-content--pop-in {
+  animation: db-shell-pop-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Tečkový spinner - stejný "logo" vzor jako @db/ui's Spinner (3x3 mřížka,
+   prostřední tečka pulzuje první, pak osmi-prstenec kolem ní), tady jen v
+   --on-accent misto --db-color-fg (na růžové vždy bílá, ne appka-tmavá). */
+.db-shell__spinner-dots {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 4px);
+  grid-template-rows: repeat(3, 4px);
+  gap: 4px;
+}
+
+.db-shell__spinner-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--db-color-on-accent);
+  animation: db-shell-spinner-pulse 1.8s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.db-shell__spinner-dot--center {
+  animation-delay: 0s;
+}
+
+@keyframes db-shell-spinner-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db-shell__spinner-dot {
+    animation: none;
+    opacity: 0.75;
+  }
 }
 
 .db-shell__dropdown {
