@@ -10,6 +10,8 @@ export interface GlobalHeaderUser {
   email?: string | null
   avatarUrl?: string | null
   fullName?: string | null
+  /** "<role> @ <jednotka>" (např. "Manažer @ VB") - appka si ji poskládá přes @db/auth's getPrimaryRoleLabel, komponenta sama o rolích nic neví. */
+  roleLabel?: string | null
 }
 
 export interface GlobalHeaderProps {
@@ -187,6 +189,7 @@ export function GlobalHeader({
                 <div className="db-shell__dropdown-name">
                   <div className="db-shell__dropdown-primary">{displayName}</div>
                   {showEmail && <div className="db-shell__dropdown-secondary">{user.email}</div>}
+                  {user.roleLabel && <div className="db-shell__dropdown-secondary">{user.roleLabel}</div>}
                 </div>
                 {adminHref && (
                   <a className="db-shell__dropdown-item" href={adminHref}>
