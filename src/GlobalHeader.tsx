@@ -8,7 +8,6 @@ export interface NavItem {
 
 export interface GlobalHeaderUser {
   email?: string | null
-  avatarUrl?: string | null
   fullName?: string | null
   /** "<role> @ <jednotka>" (např. "Manažer @ VB") - appka si ji poskládá přes @db/auth's getPrimaryRoleLabel, komponenta sama o rolích nic neví. */
   roleLabel?: string | null
@@ -54,6 +53,21 @@ async function withMinSpinDuration<T>(promise: Promise<T>): Promise<T> {
     new Promise((resolve) => setTimeout(resolve, SPIN_CYCLE_MS * MIN_SPIN_CYCLES)),
   ])
   return result
+}
+
+/**
+ * Monogram ("DS") ze jména a příjmení, jedno písmeno z e-mailu, nebo "?" -
+ * appka záměrně žádnou fotku (Google avatar apod.) neposílá, tenhle avatar
+ * je vždy jen text. "?" nastane, jen když appka nemá vůbec žádné jméno/e-mail
+ * (typicky appka vlastní logikou pošle prázdný `user`, dokud účet není
+ * aktivní - viz appStatus check v appce, komponenta samotná o tom neví).
+ */
+function getInitials(fullName: string | null | undefined, email: string | null | undefined): string {
+  const parts = fullName?.trim().split(/\s+/).filter(Boolean) ?? []
+  if (parts.length >= 2) return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase()
+  if (parts.length === 1) return parts[0]!.charAt(0).toUpperCase()
+  if (email) return email.charAt(0).toUpperCase()
+  return '?'
 }
 
 export function GlobalHeader({
@@ -106,7 +120,7 @@ export function GlobalHeader({
   }
 
   const displayName = user.fullName || user.email || '?'
-  const initial = displayName.charAt(0).toUpperCase()
+  const initials = getInitials(user.fullName, user.email)
   const showEmail = Boolean(user.email && displayName !== user.email)
 
   return (
@@ -182,7 +196,7 @@ export function GlobalHeader({
 
           <div className="db-shell__user" ref={menuRef}>
             <button type="button" className="db-shell__avatar" onClick={() => setMenuOpen((v) => !v)} title={displayName}>
-              {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : initial}
+              {initials}
             </button>
             {menuOpen && (
               <div className="db-shell__dropdown">
