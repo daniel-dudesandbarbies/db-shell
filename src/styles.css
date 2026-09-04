@@ -188,11 +188,16 @@
   background: var(--db-color-border);
 }
 
+.db-shell__backdrop {
+  display: none;
+}
+
 .db-shell__drawer {
   display: none;
-  flex-direction: column;
-  padding: 4px 8px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.db-shell__drawer-close {
+  display: none;
 }
 
 .db-shell__drawer-item {
@@ -200,21 +205,24 @@
   text-decoration: none;
   font-weight: 700;
   text-transform: uppercase;
-  font-size: 14px;
-  padding: 12px 10px;
+  font-size: 16px;
+  padding: 14px 12px;
   min-height: 44px;
   display: flex;
   align-items: center;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .db-shell__drawer-item--active {
   opacity: 1;
 }
 
-/* Mobile: hide inline nav, show hamburger + drawer instead. Matches the
-   monorepo's md=768px breakpoint convention (packages/ui's responsive
-   baseline). */
+/* Mobile: hide inline nav, show hamburger instead. Logo grows and centers
+   (bigger than the compact desktop mark). Menu becomes a full-height
+   slide-in side panel with a dimmed backdrop, not an inline dropdown -
+   scales fine once there are many more nav items than today's 3. Matches
+   the monorepo's md=768px breakpoint convention (packages/ui's
+   responsive baseline). */
 @media (max-width: 767px) {
   .db-shell__nav {
     display: none;
@@ -228,7 +236,60 @@
     margin: 0 auto;
   }
 
+  .db-shell__logo img {
+    height: 40px;
+  }
+
+  .db-shell__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .db-shell__backdrop--open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .db-shell__drawer {
     display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(85vw, 320px);
+    padding: 16px 12px;
+    background: var(--db-color-accent);
+    color: var(--db-color-on-accent);
+    z-index: 200;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+  }
+
+  .db-shell__drawer--open {
+    transform: translateX(0);
+  }
+
+  .db-shell__drawer-close {
+    display: flex;
+    align-self: flex-end;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--db-color-on-accent);
+    cursor: pointer;
+    margin-bottom: 8px;
+    flex-shrink: 0;
   }
 }

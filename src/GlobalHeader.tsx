@@ -52,6 +52,22 @@ export function GlobalHeader({ logoHref, logoSrc, navItems, user, onSignOut, adm
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [])
 
+  // Celopřekryvný drawer zamyká scroll pozadí, dokud je otevřený, a
+  // zavírá se i na Escape (ne jen klikem na backdrop).
+  useEffect(() => {
+    if (!drawerOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setDrawerOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [drawerOpen])
+
   const handleRefresh = async () => {
     if (!onRefresh || refreshing) return
     setRefreshing(true)
@@ -161,19 +177,39 @@ export function GlobalHeader({ logoHref, logoSrc, navItems, user, onSignOut, adm
         </div>
       </div>
 
-      {drawerOpen && navItems.length > 0 && (
-        <div className="db-shell__drawer">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`db-shell__drawer-item${item.active ? ' db-shell__drawer-item--active' : ''}`}
+      {navItems.length > 0 && (
+        <>
+          {/* Vždy v DOMu (ne jen když otevřený) - transform/opacity dělá
+              slide-in i slide-out animaci, podmíněný render by jen
+              okamžitě zmizel/objevil se bez přechodu. */}
+          <div
+            className={`db-shell__backdrop${drawerOpen ? ' db-shell__backdrop--open' : ''}`}
+            onClick={() => setDrawerOpen(false)}
+            aria-hidden="true"
+          />
+          <div className={`db-shell__drawer${drawerOpen ? ' db-shell__drawer--open' : ''}`}>
+            <button
+              type="button"
+              className="db-shell__drawer-close"
+              aria-label="Zavřít menu"
               onClick={() => setDrawerOpen(false)}
             >
-              {item.label}
-            </a>
-          ))}
-        </div>
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
+                <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            </button>
+            {navItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className={`db-shell__drawer-item${item.active ? ' db-shell__drawer-item--active' : ''}`}
+                onClick={() => setDrawerOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+        </>
       )}
     </header>
   )
