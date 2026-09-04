@@ -238,7 +238,7 @@ export function GlobalHeader({
           {onRefresh && (
             <button
               type="button"
-              className="db-shell__icon-btn"
+              className="db-shell__icon-btn db-shell__refresh-btn"
               onClick={handleRefresh}
               disabled={refreshPhase !== 'idle'}
               aria-label="Obnovit"

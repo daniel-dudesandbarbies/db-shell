@@ -419,6 +419,12 @@
     margin-left: 0;
   }
 
+  /* Na mobilu tuhle práci dělá potažení shora (PullToRefreshIndicator) -
+     klikací tlačítko je navíc jen na desktopu, kde gesto není k dispozici. */
+  .db-shell__refresh-btn {
+    display: none;
+  }
+
   .db-shell__backdrop {
     display: block;
     position: fixed;
