@@ -12,14 +12,13 @@
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@db/design-tokens": "git+https://github.com/daniel-dudesandbarbies/db-design-tokens.git#main"
-  },
   "peerDependencies": {
+    "@db/design-tokens": "*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@db/design-tokens": "git+https://github.com/daniel-dudesandbarbies/db-design-tokens.git#main",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "react": "^19.2.8",
