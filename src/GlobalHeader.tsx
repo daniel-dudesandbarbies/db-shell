@@ -17,6 +17,8 @@ export interface GlobalHeaderProps {
   logoHref: string
   /** Cesta ke čtvercové bílé D&B značce - appka ji má ve vlastním /public, komponenta soubor nenosí s sebou. */
   logoSrc: string
+  /** Cesta k dlouhému bílému wordmarku ("DUDES & BARBIES") zobrazenému nahoře v mobilním draweru - nepovinné, bez něj zůstane jen zavírací křížek. */
+  drawerLogoSrc?: string
   /**
    * Appka si položky SAMA předfiltruje podle vlastních permissions a spočítá
    * `active` - komponenta o permissions/routách nic neví, stejný princip
@@ -52,7 +54,16 @@ async function withMinSpinDuration<T>(promise: Promise<T>): Promise<T> {
   return result
 }
 
-export function GlobalHeader({ logoHref, logoSrc, navItems, user, onSignOut, adminHref, onRefresh }: GlobalHeaderProps) {
+export function GlobalHeader({
+  logoHref,
+  logoSrc,
+  drawerLogoSrc,
+  navItems,
+  user,
+  onSignOut,
+  adminHref,
+  onRefresh,
+}: GlobalHeaderProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
@@ -202,16 +213,30 @@ export function GlobalHeader({ logoHref, logoSrc, navItems, user, onSignOut, adm
             aria-hidden="true"
           />
           <div className={`db-shell__drawer${drawerOpen ? ' db-shell__drawer--open' : ''}`}>
-            <button
-              type="button"
-              className="db-shell__drawer-close"
-              aria-label="Zavřít menu"
-              onClick={() => setDrawerOpen(false)}
-            >
-              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
-                <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-            </button>
+            <div className="db-shell__drawer-header">
+              {drawerLogoSrc ? (
+                <a
+                  href={logoHref}
+                  className="db-shell__drawer-logo"
+                  aria-label="Domů"
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <img src={drawerLogoSrc} alt="" />
+                </a>
+              ) : (
+                <span />
+              )}
+              <button
+                type="button"
+                className="db-shell__drawer-close"
+                aria-label="Zavřít menu"
+                onClick={() => setDrawerOpen(false)}
+              >
+                <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
+                  <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
             {navItems.map((item) => (
               <a
                 key={item.href}

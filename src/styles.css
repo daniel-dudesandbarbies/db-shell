@@ -196,6 +196,29 @@
   display: none;
 }
 
+.db-shell__drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.db-shell__drawer-logo {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.db-shell__drawer-logo img {
+  /* vw, ne % - rodičovský flex item se jinak smršťuje na obsah (šířka by
+     odkazovala sama na sebe), vw se počítá vůči viewportu. */
+  width: min(65vw, 200px);
+  height: auto;
+  display: block;
+}
+
 .db-shell__drawer-close {
   display: none;
 }
@@ -222,22 +245,44 @@
    slide-in side panel with a dimmed backdrop, not an inline dropdown -
    scales fine once there are many more nav items than today's 3. Matches
    the monorepo's md=768px breakpoint convention (packages/ui's
-   responsive baseline). */
+   responsive baseline).
+
+   Row is a 1fr/auto/1fr grid (not flex + margin:auto) so the logo sits on
+   the true center of the header, not just centered in the leftover space
+   between hamburger and actions - those two sides are NOT the same width
+   (hamburger is one button, actions is search+refresh+avatar), so
+   margin:auto centering was visibly off. Explicit grid-column per element
+   keeps this correct even when hamburger is absent (navItems.length === 0). */
 @media (max-width: 767px) {
+  .db-shell__row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+
   .db-shell__nav {
     display: none;
   }
 
   .db-shell__hamburger {
     display: flex;
+    grid-column: 1;
+    justify-self: start;
   }
 
   .db-shell__logo {
-    margin: 0 auto;
+    grid-column: 2;
+    justify-self: center;
+    margin: 0;
   }
 
   .db-shell__logo img {
-    height: 40px;
+    height: 52px;
+  }
+
+  .db-shell__actions {
+    grid-column: 3;
+    justify-self: end;
+    margin-left: 0;
   }
 
   .db-shell__backdrop {
@@ -280,7 +325,7 @@
 
   .db-shell__drawer-close {
     display: flex;
-    align-self: flex-end;
+    flex-shrink: 0;
     width: 44px;
     height: 44px;
     align-items: center;
@@ -289,7 +334,5 @@
     border: none;
     color: var(--db-color-on-accent);
     cursor: pointer;
-    margin-bottom: 8px;
-    flex-shrink: 0;
   }
 }
