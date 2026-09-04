@@ -419,12 +419,6 @@
     margin-left: 0;
   }
 
-  /* Na mobilu tuhle práci dělá potažení shora (PullToRefreshIndicator) -
-     klikací tlačítko je navíc jen na desktopu, kde gesto není k dispozici. */
-  .db-shell__refresh-btn {
-    display: none;
-  }
-
   .db-shell__backdrop {
     display: block;
     position: fixed;
@@ -486,5 +480,17 @@
 
   .db-shell__drawer-close:active {
     background: rgba(255, 255, 255, 0.24);
+  }
+}
+
+/* Klikací refresh tlačítko schovat, jen když je potažení shora skutečně
+   k dispozici NAMÍSTO něj (PullToRefreshIndicator) - to je otázka
+   vstupního zařízení (dotyk vs. myš/trackpad), ne šířky obrazovky.
+   max-width breakpoint by schoval tlačítko na velkém telefonu na výšku,
+   ale nechal ho duplicitně i na iPadu nebo mobilu na šířku (oboje běžně
+   přesáhne 767px, přitom obojí je pořád dotykové). */
+@media (hover: none) and (pointer: coarse) {
+  .db-shell__refresh-btn {
+    display: none;
   }
 }
