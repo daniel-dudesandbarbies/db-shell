@@ -500,7 +500,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: height 0.2s ease, opacity 0.2s ease, background-color 0.7s ease;
+  background: var(--db-color-accent);
+  transition: height 0.2s ease, opacity 0.2s ease;
 }
 
 /* Vypíná nativní "potáhni shora pro reload" mobilních prohlížečů na
