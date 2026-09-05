@@ -11,6 +11,17 @@
   background: var(--db-color-accent);
   color: var(--db-color-on-accent);
   font-family: var(--db-font-body, inherit);
+  /* Natvrdo, ne zděděné z appky - appky co tenhle balíček používá si
+     `:root`'s font-size/line-height nastavují různě (homepage má na
+     desktopu 18px/145%, internal-platform zůstává na browser defaultu
+     16px + Tailwind Preflight's 1.5), a `.db-shell__nav-item` a spol. svůj
+     vlastní line-height nenastavují - zdědily by tak z appky FIXNÍ px
+     hodnotu (26.1px vs 24px), místo přepočtu podle svého 13px textu, a
+     hlavička byla appku od appky o pár px jinak vysoká. Číslo (ne `%`),
+     ať se každý potomek dopočítá podle SVÉ vlastní velikosti písma, ne
+     podle zděděné appka-specifické absolutní hodnoty. */
+  font-size: 16px;
+  line-height: 1.2;
   /* Sticky, ne relative - hlavička musí zůstat vidět po celou dobu
      scrollování na KAŽDÉ stránce, ne se s obsahem odscrollovat pryč. */
   position: sticky;
