@@ -512,3 +512,10 @@ html,
 body {
   overscroll-behavior-y: contain;
 }
+
+/* Ink varianta teček pro appka-specifický obsah (stránky, seznamy) - na
+   paper/ink pozadí, ne na růžové hlavičce, proto --db-color-fg (přizpůsobí
+   se dark módu) místo vždy-bílé --db-color-on-accent. */
+.db-shell__spinner-dots--ink .db-shell__spinner-dot {
+  background: var(--db-color-fg);
+}

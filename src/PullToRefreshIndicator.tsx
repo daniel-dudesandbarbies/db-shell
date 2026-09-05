@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { PullToRefreshState } from './usePullToRefresh'
 
 export interface PullToRefreshIndicatorProps {
@@ -8,10 +8,11 @@ export interface PullToRefreshIndicatorProps {
 
 // Brandmanuálové "sekundární" barvy (--db-color-secondary-* v
 // @db/design-tokens) - jinde vyhrazené pro výjimečné zdůraznění, tohle je
-// přesně ten případ. Schválený návrh: prolínání mezi nimi místo jedné
-// pevné barvy, viz Loading Splash / Pull to Refresh Strip artefakty.
-const CYCLE_COLORS = ['#CE0067', '#3185FC', '#1A535C', '#FF5400', '#E2CC01']
-const CYCLE_MS = 1800 // musí sedět s .db-shell__spinner-dot's animation-duration
+// přesně ten případ. Růžová (accent) je záměrně VYNECHANÁ - je to už
+// natrvalo barva hlavičky, v cyklu vedle ní jen splývala/matla, kde končí
+// jedno a začíná druhé.
+const CYCLE_COLORS = ['#3185FC', '#1A535C', '#FF5400', '#E2CC01']
+const CYCLE_MS = 1100
 
 /**
  * Vizuální doprovod k usePullToRefresh - dá se jako první dítě do stránky,
@@ -30,6 +31,33 @@ export function PullToRefreshIndicator({ state, threshold = 64 }: PullToRefreshI
     const id = setInterval(() => setColorIndex((i) => (i + 1) % CYCLE_COLORS.length), CYCLE_MS)
     return () => clearInterval(id)
   }, [visible])
+
+  // Zrcadlí aktuální cyklující barvu i do OS lišty (Safari/Chrome si podle
+  // <meta name="theme-color"> barví vlastní chrome) - "promítne se to pod
+  // hodiny" jen po dobu tažení/refreshe, mimo to zůstává appka's neutrální
+  // (paper/ink) hodnota z index.html, ať appka nemá TRVALE zbarvenou OS
+  // lištu jako dřív (viz historie - to bylo otravné).
+  const savedThemeColorsRef = useRef<string[] | null>(null)
+  useEffect(() => {
+    const metas = Array.from(document.querySelectorAll('meta[name="theme-color"]')) as HTMLMetaElement[]
+    if (metas.length === 0) return
+
+    if (visible) {
+      if (!savedThemeColorsRef.current) {
+        savedThemeColorsRef.current = metas.map((m) => m.content)
+      }
+      const color = CYCLE_COLORS[colorIndex]!
+      metas.forEach((m) => {
+        m.content = color
+      })
+    } else if (savedThemeColorsRef.current) {
+      const saved = savedThemeColorsRef.current
+      metas.forEach((m, i) => {
+        m.content = saved[i] ?? m.content
+      })
+      savedThemeColorsRef.current = null
+    }
+  }, [visible, colorIndex])
 
   if (!visible) return null
 
