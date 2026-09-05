@@ -30,6 +30,13 @@ export interface GlobalHeaderProps {
   onSignOut: () => void
   /** central-auth-level admin permission check (viz adminAccess.ts), ne appka-specifické právo. */
   adminHref?: string
+  /**
+   * Odkaz na central-auth's "Zabezpečení účtu" (dvoufázové ověření) - na
+   * rozdíl od adminHref není podmíněný žádným oprávněním, MFA si může
+   * zapnout každý sám pro sebe. Appka ho typicky staví jako
+   * `${CENTRAL_AUTH_URL}/security`, stejně jako adminHref.
+   */
+  securityHref?: string
   onRefresh?: () => Promise<void> | void
   /**
    * Na dotykových zařízeních je klikací refresh tlačítko defaultně schované
@@ -89,6 +96,7 @@ export function GlobalHeader({
   user,
   onSignOut,
   adminHref,
+  securityHref,
   onRefresh,
   showRefreshOnTouch = false,
 }: GlobalHeaderProps) {
@@ -305,6 +313,11 @@ export function GlobalHeader({
                 {adminHref && (
                   <a className="db-shell__dropdown-item" href={adminHref}>
                     Administrace
+                  </a>
+                )}
+                {securityHref && (
+                  <a className="db-shell__dropdown-item" href={securityHref}>
+                    Zabezpečení účtu
                   </a>
                 )}
                 <button type="button" className="db-shell__dropdown-item" onClick={onSignOut}>
