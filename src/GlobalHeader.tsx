@@ -31,6 +31,16 @@ export interface GlobalHeaderProps {
   /** central-auth-level admin permission check (viz adminAccess.ts), ne appka-specifické právo. */
   adminHref?: string
   onRefresh?: () => Promise<void> | void
+  /**
+   * Na dotykových zařízeních je klikací refresh tlačítko defaultně schované
+   * (potažení shora ho nahrazuje - viz usePullToRefresh). Appka, co ještě
+   * nemá potažení zapojené na KAŽDÉ své stránce (typicky appka s appka-
+   * specifickými scroll kontejnery, kde by jeden sdílený ref nesediel
+   * všude - např. appka s ReactFlow plátnem, co má vlastní touch panning),
+   * si tímhle tlačítko dočasně nechá viditelné i na dotyku, ať nezůstane
+   * bez JAKÉKOLI cesty k refreshi na mobilu.
+   */
+  showRefreshOnTouch?: boolean
 }
 
 /**
@@ -80,6 +90,7 @@ export function GlobalHeader({
   onSignOut,
   adminHref,
   onRefresh,
+  showRefreshOnTouch = false,
 }: GlobalHeaderProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -238,7 +249,7 @@ export function GlobalHeader({
           {onRefresh && (
             <button
               type="button"
-              className="db-shell__icon-btn db-shell__refresh-btn"
+              className={`db-shell__icon-btn${showRefreshOnTouch ? '' : ' db-shell__refresh-btn'}`}
               onClick={handleRefresh}
               disabled={refreshPhase !== 'idle'}
               aria-label="Obnovit"

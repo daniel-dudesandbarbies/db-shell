@@ -494,3 +494,21 @@
     display: none;
   }
 }
+
+.db-shell__pull-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: height 0.2s ease, opacity 0.2s ease, background-color 0.7s ease;
+}
+
+/* Vypíná nativní "potáhni shora pro reload" mobilních prohlížečů na
+   appkách, co scrollují celé tělo stránky - bez tohohle by se spouštělo
+   naše vlastní gesto (usePullToRefresh) SOUČASNĚ s tvrdým reloadem celé
+   stránky. Appka se svým vlastním scrollujícím kontejnerem (ne body) musí
+   totéž nastavit přímo na něm - viz usePullToRefresh's scrollContainerRef. */
+html,
+body {
+  overscroll-behavior-y: contain;
+}
