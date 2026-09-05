@@ -239,12 +239,9 @@ export function GlobalHeader({
         )}
 
         <div className="db-shell__actions">
-          <button type="button" className="db-shell__icon-btn" aria-label="Hledat" title="Hledat">
-            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-              <circle cx="6.5" cy="6.5" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-              <line x1="10.4" y1="10.4" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
+          {/* Hledání zatím nikde nic nedělá - vizuální placeholder radši
+              úplně pryč, než aby v hlavičce strašilo mrtvé tlačítko. Vrátit
+              zpět, až bude mít appka co hledat. */}
 
           {onRefresh && (
             <button
