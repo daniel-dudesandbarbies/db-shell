@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { BugReportModal } from './bugReport/BugReportModal'
+import type { BugReportConfig } from './bugReport/types'
 
 export interface NavItem {
   label: string
@@ -48,6 +50,14 @@ export interface GlobalHeaderProps {
    * bez JAKÉKOLI cesty k refreshi na mobilu.
    */
   showRefreshOnTouch?: boolean
+  /**
+   * Volitelné - appka, co widget nechce (zatím) nabízet, prop prostě
+   * nepředá. Když je vyplněný, přibude v dropdown menu položka "Nahlásit
+   * chybu" - viz db-shell/src/bugReport pro celou implementaci (screenshot +
+   * konzole + odeslání), komponenta samotná neví nic o appka-specifickém
+   * Supabase projektu, jen dostane hotovou konfiguraci.
+   */
+  bugReport?: BugReportConfig
 }
 
 /**
@@ -99,9 +109,11 @@ export function GlobalHeader({
   securityHref,
   onRefresh,
   showRefreshOnTouch = false,
+  bugReport,
 }: GlobalHeaderProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [bugReportOpen, setBugReportOpen] = useState(false)
   // 'idle' celou dobu kromě refresh animace - avatar i refresh tlačítko
   // jsou po tu dobu disabled, ať uživatel nerozklikne menu/refresh znovu
   // uprostřed běžící sekvence.
@@ -320,6 +332,18 @@ export function GlobalHeader({
                     Nastavení účtu
                   </a>
                 )}
+                {bugReport && (
+                  <button
+                    type="button"
+                    className="db-shell__dropdown-item"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      setBugReportOpen(true)
+                    }}
+                  >
+                    Nahlásit chybu
+                  </button>
+                )}
                 <button type="button" className="db-shell__dropdown-item" onClick={onSignOut}>
                   Odhlásit se
                 </button>
@@ -376,6 +400,10 @@ export function GlobalHeader({
             ))}
           </div>
         </>
+      )}
+
+      {bugReport && bugReportOpen && (
+        <BugReportModal config={bugReport} onClose={() => setBugReportOpen(false)} />
       )}
     </header>
   )
