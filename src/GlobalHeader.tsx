@@ -317,7 +317,7 @@ export function GlobalHeader({
                 )}
                 {securityHref && (
                   <a className="db-shell__dropdown-item" href={securityHref}>
-                    Zabezpečení účtu
+                    Nastavení účtu
                   </a>
                 )}
                 <button type="button" className="db-shell__dropdown-item" onClick={onSignOut}>
