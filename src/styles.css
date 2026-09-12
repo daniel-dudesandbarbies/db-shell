@@ -345,7 +345,10 @@
 }
 
 .db-shell__dropdown-item:hover {
-  background: var(--db-color-border);
+  /* Poloprůhledné, ne plná --db-color-border - ta na světlém pozadí
+     dropdownu působí ploše/tvrdě. Stejný vzorec jako @db/ui's button
+     hover po dnešní opravě. */
+  background: color-mix(in srgb, var(--db-color-border) 40%, transparent);
 }
 
 .db-shell__backdrop {
