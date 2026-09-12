@@ -31,15 +31,25 @@ export interface InternalPlatformNavConfig {
   baseUrl: string
   /** Appka doplní `active`, pokud zná aktuální cestu (typicky jen db-internal-platform samo - cross-app odkazy vždy vedou pryč). */
   activePath?: string
+  /** URL homepage appky - když zadáno, přidá pevnou "Home" položku na
+      začátek menu (desktop nav i hamburger drawer sdílí stejný seznam).
+      Klik na logo už tam vede taky, ale ne každému je zjevné, že logo je
+      odkaz - explicitní položka je čitelnější. Není v NAV_DEFS/DOMAIN_TIERS,
+      protože je vždy viditelná, bez ohledu na oprávnění. */
+  homeUrl?: string
 }
 
 export function buildInternalPlatformNavItems(
   permissions: string[] | undefined | null,
-  { baseUrl, activePath }: InternalPlatformNavConfig
+  { baseUrl, activePath, homeUrl }: InternalPlatformNavConfig
 ): NavItem[] {
-  return NAV_DEFS.filter((def) => hasInternalPlatformDomainAccess(permissions, def.domain)).map((def) => ({
+  const items = NAV_DEFS.filter((def) => hasInternalPlatformDomainAccess(permissions, def.domain)).map((def) => ({
     label: def.label,
     href: `${baseUrl}${def.path}`,
     active: activePath ? activePath.startsWith(def.path) : false,
   }))
+  if (homeUrl) {
+    items.unshift({ label: 'Home', href: homeUrl, active: activePath === '/' })
+  }
+  return items
 }
