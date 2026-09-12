@@ -57,6 +57,11 @@
   color: var(--db-color-on-accent);
   width: 44px;
   height: 44px;
+  /* Dnes se shoduje s @db/ui's globálním min-height (44px), takže beze
+     změny - explicitní ať se to nerozjede tichým rozporem, kdyby se
+     jedna z těch dvou hodnot někdy změnila (viz .db-shell__icon-btn/
+     .db-shell__avatar pro skutečný případ, kdy 40px vs 44px byl vidět). */
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -128,6 +133,13 @@
   color: var(--db-color-on-accent);
   width: 40px;
   height: 40px;
+  /* Appky co importují @db/ui mají globální `button { min-height:
+     var(--db-touch-target) }` (44px) - `min-height` a `height` nesoutěží
+     o specificitu (jsou to různé vlastnosti), takže bez tohohle appka's
+     min-height prostě vyhraje nad `height` výš a tlačítko vyroste na
+     44px, zatímco appka bez @db/ui (internal-platform-oz) zůstane na
+     zamýšlených 40px - přesně tenhle rozdíl byl vidět mezi appkama. */
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -202,6 +214,9 @@
   position: relative;
   width: 40px;
   height: 40px;
+  /* Stejný důvod jako .db-shell__icon-btn výš - appky s @db/ui jinak tenhle
+     button přes globální min-height: 44px nafouknou nad zamýšlených 40px. */
+  min-height: 40px;
   border: none;
   border-radius: var(--db-radius);
   background: transparent;
@@ -475,6 +490,7 @@
     -webkit-appearance: none;
     width: 44px;
     height: 44px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     background: none;
