@@ -49,7 +49,7 @@ export function buildInternalPlatformNavItems(
     active: activePath ? activePath.startsWith(def.path) : false,
   }))
   if (homeUrl) {
-    items.unshift({ label: 'Home', href: homeUrl, active: activePath === '/' })
+    items.unshift({ label: 'Domů', href: homeUrl, active: activePath === '/' })
   }
   return items
 }
