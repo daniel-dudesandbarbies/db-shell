@@ -37,17 +37,28 @@ export interface InternalPlatformNavConfig {
       odkaz - explicitní položka je čitelnější. Není v NAV_DEFS/DOMAIN_TIERS,
       protože je vždy viditelná, bez ohledu na oprávnění. */
   homeUrl?: string
+  /** URL appky "Plán aktivit" - samostatný build/repo (db-plan-aktivit),
+      sdílí ale stejný Supabase projekt/permission systém. Gated jedním
+      plochým klíčem (`internal-platform.planning.view`), ne tiery jako
+      org/procesy/inside výš, protože v1 nemá žádné odstupňované úrovně
+      přístupu. */
+  planningUrl?: string
 }
+
+const PLANNING_PERMISSION = 'internal-platform.planning.view'
 
 export function buildInternalPlatformNavItems(
   permissions: string[] | undefined | null,
-  { baseUrl, activePath, homeUrl }: InternalPlatformNavConfig
+  { baseUrl, activePath, homeUrl, planningUrl }: InternalPlatformNavConfig
 ): NavItem[] {
   const items = NAV_DEFS.filter((def) => hasInternalPlatformDomainAccess(permissions, def.domain)).map((def) => ({
     label: def.label,
     href: `${baseUrl}${def.path}`,
     active: activePath ? activePath.startsWith(def.path) : false,
   }))
+  if (planningUrl && permissions?.includes(PLANNING_PERMISSION)) {
+    items.push({ label: 'Plán aktivit', href: planningUrl, active: false })
+  }
   if (homeUrl) {
     items.unshift({ label: 'Domů', href: homeUrl, active: activePath === '/' })
   }
