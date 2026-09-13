@@ -8,21 +8,21 @@ export interface BugReportModalProps {
   onClose: () => void
 }
 
-type SubmitState = 'idle' | 'submitting' | 'success' | 'partial' | 'error'
+type SubmitState = 'idle' | 'submitting' | 'success' | 'failed'
 
 /**
- * Screenshot se pořizuje HNED při otevření (ne až při odeslání) - uživatel
- * tak vidí přesně to, co appka pošle, ještě než začne psát popis. U
- * interních screenshotů (org-chart, admin obrazovky) je tohle ta skutečná
- * "souhlasím" chvíle, ne formalita.
+ * Screenshot se pořizuje HNED při otevření (ne až při odeslání), ale
+ * záměrně TICHO - žádný náhled, žádné hlášení, jestli se povedl nebo ne
+ * (viz handleSubmit níž, kde chybějící blob prostě jen znamená, že se
+ * report pošle bez screenshotu). Uživatel má vždycky vidět stejnou
+ * uklidňující hlášku "stav webu byl zaznamenán" - kdyby věděl, že se
+ * screenshot nepovedl, mohl by report radši nepodat, přitom text sám o
+ * sobě je pořád k něčemu.
  */
 export function BugReportModal({ config, onClose }: BugReportModalProps) {
   const [screenshotBlob, setScreenshotBlob] = useState<Blob | null>(null)
-  const [screenshotReady, setScreenshotReady] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [description, setDescription] = useState('')
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const active = useRef(true)
 
   useEffect(() => {
@@ -30,20 +30,12 @@ export function BugReportModal({ config, onClose }: BugReportModalProps) {
     captureScreenshot().then((blob) => {
       if (!active.current) return
       setScreenshotBlob(blob)
-      setScreenshotReady(true)
-      if (blob) setPreviewUrl(URL.createObjectURL(blob))
     })
     return () => {
       active.current = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
-    }
-  }, [previewUrl])
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -57,13 +49,11 @@ export function BugReportModal({ config, onClose }: BugReportModalProps) {
     e.preventDefault()
     if (!description.trim() || submitState === 'submitting') return
     setSubmitState('submitting')
-    setErrorMessage(null)
 
     try {
       const token = await config.getAccessToken()
       if (!token) {
-        setSubmitState('error')
-        setErrorMessage('Nejsi přihlášený/á, zkus to prosím po znovunačtení stránky.')
+        setSubmitState('failed')
         return
       }
 
@@ -82,22 +72,24 @@ export function BugReportModal({ config, onClose }: BugReportModalProps) {
       })
 
       if (!res.ok) {
-        const body = await res.json().catch(() => null)
-        setSubmitState('error')
-        setErrorMessage(body?.error ?? `Nahlášení selhalo (HTTP ${res.status})`)
+        setSubmitState('failed')
         return
       }
 
+      // vikunjaTaskId chybí = report se sice uložil, ale úkol ve Vikunja
+      // nevznikl, takže by ho nikdo neviděl a nikdo by na něj nereagoval -
+      // z pohledu uživatele je tohle stejně "nedoručeno", ne poloviční
+      // úspěch (viz report-bug edge funkce, delivery_status zůstane 'failed'
+      // pro ruční dohledání).
       const body = await res.json().catch(() => ({}))
-      setSubmitState(body?.vikunjaTaskId ? 'success' : 'partial')
-    } catch (err) {
-      setSubmitState('error')
-      setErrorMessage(err instanceof Error ? err.message : 'Síťová chyba při odesílání.')
+      setSubmitState(body?.vikunjaTaskId ? 'success' : 'failed')
+    } catch {
+      setSubmitState('failed')
     }
   }
 
   const submitting = submitState === 'submitting'
-  const done = submitState === 'success' || submitState === 'partial'
+  const done = submitState === 'success' || submitState === 'failed'
 
   return (
     <div className="db-shell__bugreport-backdrop db-shell__no-screenshot" onClick={onClose}>
@@ -112,10 +104,11 @@ export function BugReportModal({ config, onClose }: BugReportModalProps) {
 
         {done ? (
           <div className="db-shell__bugreport-done">
-            <p>Díky, nahlásili jsme to.</p>
-            {submitState === 'partial' && (
+            {submitState === 'success' ? (
+              <p>Díky, nahlásili jsme to.</p>
+            ) : (
               <p className="db-shell__bugreport-warning">
-                Report je uložený, ale založení úkolu ve Vikunja se teď nepovedlo - doděláme to ručně.
+                Zpětnou vazbu se nepodařilo odeslat, kontaktuj správce přímo.
               </p>
             )}
             <button type="button" className="db-shell__bugreport-btn-primary" onClick={onClose}>
@@ -125,11 +118,7 @@ export function BugReportModal({ config, onClose }: BugReportModalProps) {
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="db-shell__bugreport-preview">
-              {!screenshotReady && <div className="db-shell__bugreport-preview-loading">Pořizuji screenshot…</div>}
-              {screenshotReady && previewUrl && <img src={previewUrl} alt="Náhled screenshotu" />}
-              {screenshotReady && !previewUrl && (
-                <div className="db-shell__bugreport-preview-loading">Screenshot se nepovedlo pořídit, report půjde i bez něj.</div>
-              )}
+              <div className="db-shell__bugreport-preview-loading">Stav webu byl zaznamenán.</div>
             </div>
 
             <label className="db-shell__bugreport-label" htmlFor="bug-report-description">
@@ -145,10 +134,6 @@ export function BugReportModal({ config, onClose }: BugReportModalProps) {
               autoFocus
               required
             />
-
-            {submitState === 'error' && errorMessage && (
-              <p className="db-shell__bugreport-warning">{errorMessage}</p>
-            )}
 
             <div className="db-shell__bugreport-actions">
               <button type="button" className="db-shell__bugreport-btn-secondary" onClick={onClose} disabled={submitting}>
