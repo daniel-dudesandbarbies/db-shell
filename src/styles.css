@@ -43,7 +43,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 16px;
+  /* .db-shell samo (viz výš) je sticky na top:0, ať jeho pozadí vyplní i
+     plochu za notch/dynamic islandem - obsah řádku (logo/nav/hodiny) ale
+     musí sedět POD ní, jinak ho v instalované PWA (viewport-fit=cover)
+     překrývají hodiny/signál/baterie z iOS status baru. env() se safe
+     degraduje na 0 v prohlížečích/zařízeních bez notch, takže tohle nic
+     neposune na běžném desktopu/androidu bez výřezu. */
+  padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
   min-height: 56px;
 }
 
@@ -472,7 +478,9 @@
     bottom: 0;
     left: 0;
     width: min(85vw, 320px);
-    padding: 16px 12px;
+    /* Stejný důvod jako .db-shell__row výš - fixed na top:0, obsah by jinak
+       na iPhone startoval pod notch/status barem. */
+    padding: calc(16px + env(safe-area-inset-top)) 12px 16px;
     background: var(--db-color-accent);
     color: var(--db-color-on-accent);
     z-index: 200;
