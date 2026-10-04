@@ -14,7 +14,7 @@ import { GlobalHeader, hasAdminAccess } from '@db/shell'
 import '@db/shell/styles.css'
 
 <GlobalHeader
-  logoHref="https://db-homepage.pages.dev"
+  logoHref="https://dudesandbarbies.online"
   logoSrc="/db-logo-mark.png"
   navItems={[
     { label: 'Org struktura', href: '/org', active: pathname === '/org' },
