@@ -970,3 +970,77 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* --- Mezistránky (StatusScreen) --- */
+.db-status {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--db-color-brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  font-family: var(--db-font-body);
+}
+.db-status__inner {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  text-align: center;
+}
+.db-status__logo {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin: 0 auto 28px;
+}
+.db-status h1 {
+  margin: 0;
+  font-family: var(--db-font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+.db-status p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+.db-status__btn,
+.db-status__btn:hover:not(:disabled) {
+  min-height: 52px;
+  padding: 0 24px;
+  border: 2px solid #fff;
+  border-radius: var(--db-radius-pill);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.db-status__btn:hover:not(:disabled) {
+  background: #fff;
+  color: var(--db-color-brand);
+}
+.db-status__btn:disabled {
+  opacity: 0.6;
+}
+.db-status__error {
+  color: #fff !important;
+  background: var(--db-color-highlight);
+  border-radius: 14px;
+  padding: 8px 14px;
+}
