@@ -1,7 +1,7 @@
 export { GlobalHeader } from './GlobalHeader'
 export type { GlobalHeaderProps, GlobalHeaderUser, NavItem } from './GlobalHeader'
 export { ADMIN_PERMISSIONS, hasAdminAccess } from './adminAccess'
-export { buildInternalPlatformNavItems, hasInternalPlatformDomainAccess } from './internalPlatformNav'
+export { buildInternalPlatformNavItems, buildContentNavItems, hasInternalPlatformDomainAccess } from './internalPlatformNav'
 export type { InternalPlatformDomain, InternalPlatformNavConfig } from './internalPlatformNav'
 export { usePullToRefresh } from './usePullToRefresh'
 export type { UsePullToRefreshOptions, PullToRefreshState } from './usePullToRefresh'

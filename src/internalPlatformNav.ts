@@ -64,3 +64,32 @@ export function buildInternalPlatformNavItems(
   }
   return items
 }
+
+/**
+ * Obsahová navigace nové hlavičky (AppHeader / FloatingMenu) - stejné
+ * položky a popisky ve všech appkách: Procesy, Bible (= Inside),
+ * Struktura (= Org), Plán aktivit. Viditelnost podle stejných oprávnění
+ * jako buildInternalPlatformNavItems. "Domů" tu není - vede tam logo.
+ */
+const CONTENT_NAV_DEFS: { label: string; path: string; domain: InternalPlatformDomain }[] = [
+  { label: 'Procesy', path: '/procesy', domain: 'procesy' },
+  { label: 'Bible', path: '/inside', domain: 'inside' },
+  { label: 'Struktura', path: '/org', domain: 'org' },
+]
+
+export function buildContentNavItems(
+  permissions: string[] | undefined | null,
+  { baseUrl, activePath, planningUrl, planningActive }: InternalPlatformNavConfig & { planningActive?: boolean }
+): NavItem[] {
+  const items: NavItem[] = CONTENT_NAV_DEFS.filter((def) => hasInternalPlatformDomainAccess(permissions, def.domain)).map(
+    (def) => ({
+      label: def.label,
+      href: `${baseUrl}${def.path}`,
+      active: activePath ? activePath.startsWith(def.path) : false,
+    })
+  )
+  if (planningUrl && permissions?.includes(PLANNING_PERMISSION)) {
+    items.push({ label: 'Plán aktivit', href: planningUrl, active: planningActive ?? false })
+  }
+  return items
+}
