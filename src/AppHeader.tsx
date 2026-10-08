@@ -1,5 +1,6 @@
 import { AccountMenu, type AccountMenuProps } from './AccountMenu'
 import { FloatingMenu } from './FloatingMenu'
+import { HomeIcon } from './HomeIcon'
 import type { NavItem } from './GlobalHeader'
 
 export interface AppHeaderProps {
@@ -10,6 +11,10 @@ export interface AppHeaderProps {
   /** Obsahová navigace (Procesy, Bible, Struktura, Plán aktivit...) - appka si ji sama vyfiltruje podle oprávnění a spočítá `active`. */
   navItems: NavItem[]
   account: AccountMenuProps
+  /** Tlačítko Domů (domeček) - kam vede; výchozí = logoHref. */
+  homeHref?: string
+  /** Uživatel je právě na homepage (zvýraznit domeček). */
+  homeActive?: boolean
 }
 
 /**
@@ -18,13 +23,23 @@ export interface AppHeaderProps {
  * iniciály s menu účtu vpravo. Na telefonu se navigace přesune do plovoucí
  * bubliny vpravo dole (FloatingMenu).
  */
-export function AppHeader({ logoHref, logoSrc, navItems, account }: AppHeaderProps) {
+export function AppHeader({ logoHref, logoSrc, navItems, account, homeHref, homeActive }: AppHeaderProps) {
   return (
     <>
       <header className="db-appheader">
         <div className="db-appheader__inner">
           <a className="db-appheader__logo" href={logoHref}>
             <img src={logoSrc} alt="Dudes & Barbies" />
+          </a>
+          {/* Domů - vždy vidět, i na telefonu (pilulky jsou tam v bublině). */}
+          <a
+            className={`db-appheader__home${homeActive ? ' is-active' : ''}`}
+            href={homeHref ?? logoHref}
+            aria-label="Domů"
+            title="Domů"
+            aria-current={homeActive ? 'page' : undefined}
+          >
+            <HomeIcon />
           </a>
           {navItems.length > 0 && (
             <nav className="db-appheader__nav" aria-label="Navigace">

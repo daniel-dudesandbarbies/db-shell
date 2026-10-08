@@ -1044,3 +1044,26 @@ body {
   border-radius: 14px;
   padding: 8px 14px;
 }
+
+/* Tlačítko Domů (domeček se značkou D&B) - kruh jako avatar. */
+.db-appheader__home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  flex-shrink: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.db-appheader__home:hover,
+.db-appheader__home.is-active {
+  background: #fff;
+  color: var(--db-color-brand);
+}
+/* Logo vlevo odsune zbytek doprava - domeček, pilulky a avatar těsně u sebe. */
+.db-appheader__inner > .db-appheader__home {
+  margin-right: -12px;
+}
