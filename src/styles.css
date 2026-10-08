@@ -699,9 +699,9 @@ body {
   display: flex;
   align-items: center;
   gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: calc(14px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 14px max(20px, env(safe-area-inset-left));
+  /* Přes celou šířku i na širokém displeji: logo úplně vlevo, avatar úplně
+     vpravo, navigace hned vedle něj. */
+  padding: calc(14px + env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 14px max(24px, env(safe-area-inset-left));
   box-sizing: border-box;
 }
 .db-appheader__logo {
