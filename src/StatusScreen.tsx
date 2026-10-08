@@ -7,6 +7,9 @@ import type { ReactNode } from 'react'
  * přesměrování trvají zlomek vteřiny, text by jen problikl.
  */
 export function StatusScreen({ logoSrc, children }: { logoSrc: string; children?: ReactNode }) {
+  // Třídy pro obsah: db-status__btn (zaoblené tlačítko), db-status__error,
+  // db-status__form + db-status__input (--code), db-status__link,
+  // db-status__badge (kroužek pro cizí logo v tlačítku).
   return (
     <div className="db-status">
       {children && (

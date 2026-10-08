@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { useDismiss } from './useDismiss'
-import type { NavItem } from './GlobalHeader'
+import type { NavItem } from './internalPlatformNav'
 
 /**
  * Plovoucí bublina vpravo dole - obsahová navigace na telefonu, stejná ve

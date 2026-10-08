@@ -1,7 +1,7 @@
 import { AccountMenu, type AccountMenuProps } from './AccountMenu'
 import { FloatingMenu } from './FloatingMenu'
 import { HomeIcon } from './HomeIcon'
-import type { NavItem } from './GlobalHeader'
+import type { NavItem } from './internalPlatformNav'
 
 export interface AppHeaderProps {
   /** Kam vede logo - homepage (appka dodává svou znalost, kde homepage žije). */

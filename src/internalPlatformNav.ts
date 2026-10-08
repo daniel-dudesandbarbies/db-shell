@@ -1,4 +1,9 @@
-import type { NavItem } from './GlobalHeader'
+/** Položka obsahové navigace (AppHeader pilulky / FloatingMenu). */
+export interface NavItem {
+  label: string
+  href: string
+  active?: boolean
+}
 
 export type InternalPlatformDomain = 'org' | 'procesy' | 'inside'
 
@@ -20,50 +25,22 @@ export function hasInternalPlatformDomainAccess(
   return DOMAIN_TIERS[domain].some((tier) => permissions.includes(`internal-platform.${domain}.${tier}`))
 }
 
-const NAV_DEFS: { label: string; path: string; domain: InternalPlatformDomain }[] = [
-  { label: 'Org struktura', path: '/org', domain: 'org' },
-  { label: 'Procesy', path: '/procesy', domain: 'procesy' },
-  { label: 'Inside', path: '/inside', domain: 'inside' },
-]
-
 export interface InternalPlatformNavConfig {
   /** Kořen db-internal-platform appky - '' pro appku samotnou (relativní cesty), jinak plná URL (cross-app odkaz z central-auth/homepage). */
   baseUrl: string
   /** Appka doplní `active`, pokud zná aktuální cestu (typicky jen db-internal-platform samo - cross-app odkazy vždy vedou pryč). */
   activePath?: string
-  /** URL homepage appky - když zadáno, přidá pevnou "Home" položku na
-      začátek menu (desktop nav i hamburger drawer sdílí stejný seznam).
-      Klik na logo už tam vede taky, ale ne každému je zjevné, že logo je
-      odkaz - explicitní položka je čitelnější. Není v NAV_DEFS/DOMAIN_TIERS,
-      protože je vždy viditelná, bez ohledu na oprávnění. */
-  homeUrl?: string
   /** URL appky "Plán aktivit" - samostatný build/repo (db-plan-aktivit),
       sdílí ale stejný Supabase projekt/permission systém. Gated jedním
       plochým klíčem (`internal-platform.planning.view`), ne tiery jako
       org/procesy/inside výš, protože v1 nemá žádné odstupňované úrovně
       přístupu. */
   planningUrl?: string
+  /** Appka Plán aktivit sama sebe zvýrazní. */
+  planningActive?: boolean
 }
 
 const PLANNING_PERMISSION = 'internal-platform.planning.view'
-
-export function buildInternalPlatformNavItems(
-  permissions: string[] | undefined | null,
-  { baseUrl, activePath, homeUrl, planningUrl }: InternalPlatformNavConfig
-): NavItem[] {
-  const items = NAV_DEFS.filter((def) => hasInternalPlatformDomainAccess(permissions, def.domain)).map((def) => ({
-    label: def.label,
-    href: `${baseUrl}${def.path}`,
-    active: activePath ? activePath.startsWith(def.path) : false,
-  }))
-  if (planningUrl && permissions?.includes(PLANNING_PERMISSION)) {
-    items.push({ label: 'Plán aktivit', href: planningUrl, active: false })
-  }
-  if (homeUrl) {
-    items.unshift({ label: 'Domů', href: homeUrl, active: activePath === '/' })
-  }
-  return items
-}
 
 /**
  * Obsahová navigace nové hlavičky (AppHeader / FloatingMenu) - stejné
@@ -79,7 +56,7 @@ const CONTENT_NAV_DEFS: { label: string; path: string; domain: InternalPlatformD
 
 export function buildContentNavItems(
   permissions: string[] | undefined | null,
-  { baseUrl, activePath, planningUrl, planningActive }: InternalPlatformNavConfig & { planningActive?: boolean }
+  { baseUrl, activePath, planningUrl, planningActive }: InternalPlatformNavConfig
 ): NavItem[] {
   const items: NavItem[] = CONTENT_NAV_DEFS.filter((def) => hasInternalPlatformDomainAccess(permissions, def.domain)).map(
     (def) => ({
