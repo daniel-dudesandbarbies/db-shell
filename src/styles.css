@@ -535,3 +535,26 @@ body {
 .db-status__link:hover:not(:disabled) {
   opacity: 0.85;
 }
+
+/* Šipka zpět (BackIcon) - jedna podoba ve všech appkách. Odkaz/tlačítko
+   "zpět" s textem: .db-back (ikona + text vedle sebe). */
+.db-back-icon {
+  flex-shrink: 0;
+}
+.db-back-icon circle {
+  fill: var(--db-color-brand);
+}
+.db-back-icon path {
+  stroke: #fff;
+}
+.db-back-icon--inverse circle {
+  fill: #fff;
+}
+.db-back-icon--inverse path {
+  stroke: var(--db-color-brand);
+}
+.db-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
