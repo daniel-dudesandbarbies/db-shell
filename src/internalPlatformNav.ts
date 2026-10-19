@@ -38,14 +38,20 @@ export interface InternalPlatformNavConfig {
   planningUrl?: string
   /** Appka Plán aktivit sama sebe zvýrazní. */
   planningActive?: boolean
+  /** URL správy TV menu (tvdisplay admin) - jen pro toho, kdo má
+      `tvdisplay.manage`, stejně jako dlaždice TV v Nastavení. */
+  tvUrl?: string
+  /** TV admin sám sebe zvýrazní. */
+  tvActive?: boolean
 }
 
 const PLANNING_PERMISSION = 'internal-platform.planning.view'
+const TV_PERMISSION = 'tvdisplay.manage'
 
 /**
  * Obsahová navigace nové hlavičky (AppHeader / FloatingMenu) - stejné
  * položky a popisky ve všech appkách: Procesy, Bible (= Inside),
- * Struktura (= Org), Plán aktivit. Viditelnost podle stejných oprávnění
+ * Struktura (= Org), Plán aktivit, TV menu. Viditelnost podle stejných oprávnění
  * jako buildInternalPlatformNavItems. "Domů" tu není - vede tam logo.
  */
 const CONTENT_NAV_DEFS: { label: string; path: string; domain: InternalPlatformDomain }[] = [
@@ -56,7 +62,7 @@ const CONTENT_NAV_DEFS: { label: string; path: string; domain: InternalPlatformD
 
 export function buildContentNavItems(
   permissions: string[] | undefined | null,
-  { baseUrl, activePath, planningUrl, planningActive }: InternalPlatformNavConfig
+  { baseUrl, activePath, planningUrl, planningActive, tvUrl, tvActive }: InternalPlatformNavConfig
 ): NavItem[] {
   const items: NavItem[] = CONTENT_NAV_DEFS.filter((def) => hasInternalPlatformDomainAccess(permissions, def.domain)).map(
     (def) => ({
@@ -67,6 +73,9 @@ export function buildContentNavItems(
   )
   if (planningUrl && permissions?.includes(PLANNING_PERMISSION)) {
     items.push({ label: 'Plán aktivit', href: planningUrl, active: planningActive ?? false })
+  }
+  if (tvUrl && permissions?.includes(TV_PERMISSION)) {
+    items.push({ label: 'TV menu', href: tvUrl, active: tvActive ?? false })
   }
   return items
 }
