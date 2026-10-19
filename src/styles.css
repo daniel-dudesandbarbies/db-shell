@@ -95,6 +95,11 @@ body {
   background: var(--db-color-brand);
   color: #fff;
   font-family: var(--db-font-body);
+  /* Vlastní typografie nezávislá na appce - homepage dědí z :root 145 %
+     z 18px a 0.18px prostrkání, platforma 1.5 z Tailwindu; bez tohohle
+     měla lišta v každé appce jinou výšku (vidět při přechodu mezi nimi). */
+  line-height: 1.5;
+  letter-spacing: normal;
 }
 .db-appheader__inner {
   display: flex;
@@ -124,6 +129,8 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.4);
   color: #fff;
   font-size: 14px;
+  /* 22 + 2×8 padding + 2×1 rámeček = 40px, stejně jako Domů a iniciály. */
+  line-height: 22px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
