@@ -48,12 +48,22 @@
 
 
 .db-shell__pull-refresh {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  position: relative;
+  z-index: 60; /* nad AppHeader (50) - kuličky přesahují do jeho horního okraje */
   background: var(--db-color-accent);
   transition: height 0.2s ease, opacity 0.2s ease;
+}
+
+/* Pruh roste od horního okraje obrazovky, tedy pod hodinami/výřezem
+   (viewport-fit=cover). Kuličky proto sedí o ochrannou zónu níž - přesahují
+   do horního okraje odstrčené hlavičky, který má stejnou barvu a ochrannou
+   zónu v sobě (viz .db-appheader__inner), takže jsou vidět pod stavovým
+   řádkem a nad obsahem hlavičky. Bez výřezu je inset 0 = uprostřed pruhu. */
+.db-shell__pull-refresh > .db-shell__spinner-dots {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + env(safe-area-inset-top));
+  transform: translate(-50%, -50%);
 }
 
 /* Vypíná nativní "potáhni shora pro reload" mobilních prohlížečů na
