@@ -978,7 +978,10 @@ body {
   gap: 4px;
   margin-bottom: 8px;
 }
-.db-timeline__nav .db-plan__btn {
+/* I s :hover - jinak by obecné .db-plan__btn:hover vrátilo větší rozměr
+   a tlačítka by při najetí poskočila. */
+.db-timeline__nav .db-plan__btn,
+.db-timeline__nav .db-plan__btn:hover:not(:disabled) {
   min-height: 34px;
   padding: 0 12px;
   font-size: 16px;
