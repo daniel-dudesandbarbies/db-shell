@@ -17,3 +17,26 @@ export { StatusScreen } from './StatusScreen'
 export { BackIcon } from './BackIcon'
 export { Select } from './Select'
 export type { SelectOption, SelectProps } from './Select'
+export {
+  SlotBadge,
+  DateRangeFields,
+  PlacementForm,
+  PlacementTimeline,
+  PlacementConflictError,
+  SLOT_NAMES,
+  addDays,
+  daysBetween,
+  startOfWeek,
+  formatDay,
+  formatRange,
+} from './Placements'
+export type {
+  PlacementSlot,
+  Placement,
+  PlacementConflict,
+  PlacementCheck,
+  PlacementDraft,
+  PlacementFormProps,
+  TimelineItem,
+  PlacementTimelineProps,
+} from './Placements'
