@@ -565,3 +565,177 @@ body {
   align-items: center;
   gap: 10px;
 }
+
+/* --- Rozbalovník (Select.tsx) ---
+   Pole se šipkou v kolečku (jako rozbalování stromu v Bible) a seznam ve
+   vzhledu menu účtu. Selektory s :hover:not(:disabled) přebíjí globální
+   reset tlačítek v appkách (button {...} z @db/ui, homepage theme). */
+.db-select {
+  position: relative;
+  display: inline-block;
+  min-width: 0;
+  vertical-align: middle;
+  font-family: var(--db-font-body);
+}
+.db-select .db-select__trigger,
+.db-select .db-select__trigger:hover:not(:disabled) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 9px 0 16px;
+  border: 1px solid var(--db-color-border);
+  border-radius: var(--db-radius);
+  background: var(--db-color-bg);
+  color: var(--db-color-fg);
+  font: inherit;
+  font-size: 16px; /* iOS nezoomuje */
+  font-weight: var(--db-font-body-weight-control);
+  line-height: 1.3;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.db-select .db-select__trigger:hover:not(:disabled),
+.db-select .db-select__trigger[aria-expanded='true'] {
+  border-color: var(--db-color-brand);
+}
+.db-select .db-select__trigger:focus-visible {
+  outline: none;
+  border-color: var(--db-color-brand);
+  box-shadow: 0 0 0 3px rgba(var(--db-color-brand-rgb), 0.18);
+}
+.db-select .db-select__trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.db-select__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.db-select__value.is-placeholder {
+  color: var(--db-color-muted);
+}
+.db-select__chevron {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(var(--db-color-brand-rgb), 0.1);
+  color: var(--db-color-brand);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.db-select__chevron svg {
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+.db-select .db-select__trigger:hover:not(:disabled) .db-select__chevron,
+.db-select .db-select__trigger[aria-expanded='true'] .db-select__chevron {
+  background: var(--db-color-brand);
+  color: #fff;
+}
+.db-select .db-select__trigger[aria-expanded='true'] .db-select__chevron svg {
+  transform: rotate(-90deg);
+}
+.db-select--sm .db-select__trigger,
+.db-select--sm .db-select__trigger:hover:not(:disabled) {
+  min-height: 34px;
+  padding: 0 5px 0 12px;
+  gap: 8px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+.db-select--sm .db-select__chevron {
+  width: 22px;
+  height: 22px;
+}
+
+.db-select__popover {
+  position: fixed;
+  z-index: 2000; /* nad modaly všech appek */
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100vw - 16px);
+  padding: 6px;
+  background: #fff;
+  border-radius: var(--db-radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  font-family: var(--db-font-body);
+  overflow: hidden;
+}
+.db-select__popover .db-select__search {
+  flex: none;
+  width: 100%;
+  min-height: 40px;
+  margin: 0 0 6px;
+  padding: 0 14px;
+  border: 1px solid var(--db-color-border);
+  border-radius: var(--db-radius-pill);
+  background: #fff;
+  color: var(--db-color-fg);
+  font: inherit;
+  font-size: 16px;
+  font-weight: var(--db-font-body-weight-control);
+  outline: none;
+}
+.db-select__popover .db-select__search:focus {
+  border-color: var(--db-color-brand);
+}
+.db-select__list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: none;
+}
+.db-select__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--db-color-brand);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  user-select: none;
+}
+.db-select__option.is-active {
+  background: rgba(var(--db-color-brand-rgb), 0.08);
+}
+.db-select__option.is-selected {
+  font-weight: 800;
+}
+.db-select__option[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: default;
+}
+.db-select__check {
+  flex: none;
+}
+.db-select__empty {
+  padding: 10px 12px;
+  color: var(--db-color-muted);
+  font-size: 14px;
+}
+.db-select__popover--sm .db-select__option {
+  padding: 8px 10px;
+  font-size: 14px;
+}
