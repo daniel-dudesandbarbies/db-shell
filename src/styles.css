@@ -757,22 +757,6 @@ body {
 .db-slot svg {
   flex: none;
 }
-.db-slot rect {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.4;
-  opacity: 0.45;
-}
-.db-slot rect.is-on {
-  fill: currentColor;
-  opacity: 1;
-}
-.db-slot rect.is-rest {
-  stroke: none;
-  fill: currentColor;
-  opacity: 0.15;
-}
-
 .db-plan {
   display: flex;
   flex-direction: column;
@@ -813,43 +797,6 @@ body {
 }
 .db-field input[type='date']:disabled {
   opacity: 0.55;
-}
-
-.db-slotpicker {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.db-slotpicker button,
-.db-slotpicker button:hover:not(:disabled) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  margin: 0;
-  padding: 0 12px;
-  border: 1px solid var(--db-color-border);
-  border-radius: var(--db-radius);
-  background: var(--db-color-bg);
-  font: inherit;
-  font-size: 15px;
-  text-transform: none;
-  letter-spacing: normal;
-  box-shadow: none;
-  cursor: pointer;
-}
-.db-slotpicker button:hover:not(:disabled) {
-  border-color: var(--db-color-brand);
-}
-.db-slotpicker button.is-selected,
-.db-slotpicker button.is-selected:hover:not(:disabled) {
-  border-color: var(--db-color-brand);
-  background: rgba(var(--db-color-brand-rgb), 0.08);
-  box-shadow: inset 0 0 0 1px var(--db-color-brand);
-}
-.db-slotpicker button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .db-daterange {

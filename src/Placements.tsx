@@ -8,8 +8,11 @@ import { Select, type SelectOption } from './Select'
 //
 // Data jsou ISO dny 'YYYY-MM-DD' (pražský den, "dnes" posílá server),
 // ends_on null = do odvolání.
+//
+// Od platform migrace 0026 je na homepage jen jedna aktualita - slot
+// zůstává v datech kvůli tvaru API, ale je vždy 1.
 
-export type PlacementSlot = 1 | 2
+export type PlacementSlot = 1
 
 export interface Placement {
   id: string
@@ -21,7 +24,7 @@ export interface Placement {
 
 export interface PlacementConflict extends Placement {
   title: string
-  /** slot = jiný článek na stejné pozici, page = tentýž článek na druhé pozici. */
+  /** slot = jiný článek ve stejné dny, page = tentýž článek ve stejné dny. */
   kind: 'slot' | 'page'
 }
 
@@ -36,11 +39,6 @@ export interface PlacementDraft {
   slot: PlacementSlot
   starts_on: string
   ends_on: string | null
-}
-
-export const SLOT_NAMES: Record<PlacementSlot, string> = {
-  1: 'Pozice 1',
-  2: 'Pozice 2',
 }
 
 // --- Data (ISO dny bez časové zóny - počítá se v UTC, ať posun času nic
@@ -75,57 +73,26 @@ export function formatRange(from: string, to: string | null): string {
 
 const WEEKDAYS = ['ne', 'po', 'út', 'st', 'čt', 'pá', 'so']
 
-// --- Indikátor pozice: mini homepage se dvěma aktualitami (vlevo menší
-// pozice 1, vedle vyšší pozice 2), vybraná vyplněná ---
+// --- Značka "na homepage" (domeček) ---
 
-export function SlotBadge({
-  slot,
-  withLabel = true,
+export function HomepageBadge({
+  label,
   className = '',
-  title = SLOT_NAMES[slot],
+  title = 'Na homepage',
 }: {
-  slot: PlacementSlot
-  withLabel?: boolean
+  /** Text vedle ikony; bez něj jen ikona. */
+  label?: string
   className?: string
   title?: string
 }) {
   return (
     <span className={`db-slot ${className}`} title={title}>
-      <svg width="26" height="18" viewBox="0 0 26 18" aria-hidden>
-        <rect x="1" y="1" width="11" height="10" rx="2.5" className={slot === 1 ? 'is-on' : ''} />
-        <rect x="14" y="1" width="11" height="12.5" rx="2.5" className={slot === 2 ? 'is-on' : ''} />
-        <rect x="1" y="13" width="11" height="4" rx="1.5" className="is-rest" />
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M3 10.5 12 3l9 7.5" />
+        <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" />
       </svg>
-      {withLabel && <span>{SLOT_NAMES[slot]}</span>}
+      {label && <span>{label}</span>}
     </span>
-  )
-}
-
-function SlotPicker({
-  value,
-  onChange,
-  disabled,
-}: {
-  value: PlacementSlot
-  onChange: (slot: PlacementSlot) => void
-  disabled?: boolean
-}) {
-  return (
-    <div className="db-slotpicker" role="radiogroup" aria-label="Pozice na homepage">
-      {([1, 2] as const).map((s) => (
-        <button
-          key={s}
-          type="button"
-          role="radio"
-          aria-checked={value === s}
-          className={value === s ? 'is-selected' : ''}
-          disabled={disabled}
-          onClick={() => onChange(s)}
-        >
-          <SlotBadge slot={s} />
-        </button>
-      ))}
-    </div>
   )
 }
 
@@ -263,7 +230,6 @@ export function PlacementForm({
 
   const pageConflicts = result?.conflicts.filter((c) => c.kind === 'page') ?? []
   const slotConflicts = result?.conflicts.filter((c) => c.kind === 'slot') ?? []
-  const otherSlot: PlacementSlot = draft.slot === 1 ? 2 : 1
   const blocked = pageConflicts.length > 0 || slotConflicts.length > 0
   const invalid = !draft.page_id || (!running && draft.starts_on < today) || (draft.ends_on !== null && draft.ends_on < draft.starts_on)
 
@@ -309,11 +275,6 @@ export function PlacementForm({
         </label>
       )}
 
-      <div className="db-field">
-        <span>Pozice na homepage</span>
-        <SlotPicker value={draft.slot} onChange={(slot) => setDraft((d) => ({ ...d, slot }))} disabled={running} />
-      </div>
-
       <DateRangeFields
         from={draft.starts_on}
         to={draft.ends_on}
@@ -326,7 +287,7 @@ export function PlacementForm({
         <div className="db-plan__conflict" role="alert">
           {pageConflicts.map((c) => (
             <p key={c.id}>
-              Tenhle článek už je {formatRange(c.starts_on, c.ends_on)} na {SLOT_NAMES[c.slot].toLowerCase()}. Uprav termín.
+              Tenhle článek už je na homepage {formatRange(c.starts_on, c.ends_on)}. Uprav termín.
             </p>
           ))}
         </div>
@@ -335,18 +296,13 @@ export function PlacementForm({
         <div className="db-plan__conflict" role="alert">
           {slotConflicts.map((c) => (
             <p key={c.id}>
-              {SLOT_NAMES[draft.slot]} je {formatRange(c.starts_on, c.ends_on)} obsazená: <strong>{c.title}</strong>
+              Homepage je {formatRange(c.starts_on, c.ends_on)} obsazená: <strong>{c.title}</strong>
             </p>
           ))}
           <p className="db-plan__hint">
             Nahrazení jim termín zkrátí, rozdělí nebo zruší - jen ve dnech, které tu vybíráš.
           </p>
           <div className="db-plan__actions">
-            {result?.other_slot_free && (
-              <button type="button" className="db-plan__btn" disabled={busy} onClick={() => setDraft((d) => ({ ...d, slot: otherSlot }))}>
-                Použít {SLOT_NAMES[otherSlot].toLowerCase()} (volná)
-              </button>
-            )}
             <button type="button" className="db-plan__btn db-plan__btn--warn" disabled={busy || invalid} onClick={() => submit(true)}>
               Nahradit a uložit
             </button>
@@ -379,7 +335,7 @@ export function PlacementForm({
   )
 }
 
-// --- Timeline obou pozic ---
+// --- Timeline aktuality na homepage ---
 
 export interface TimelineItem extends Placement {
   label: string
@@ -397,7 +353,7 @@ export interface PlacementTimelineProps {
   onToday?: () => void
   onSelectItem?: (item: TimelineItem) => void
   /** Klik do prázdného dne - nový termín od toho dne. */
-  onSelectDay?: (slot: PlacementSlot, day: string) => void
+  onSelectDay?: (day: string) => void
   loading?: boolean
 }
 
@@ -465,20 +421,16 @@ export function PlacementTimeline({
             )
           })}
 
-          {([1, 2] as const).map((slot) => (
-            <TimelineLane
-              key={slot}
-              slot={slot}
-              row={slot + 1}
-              today={today}
-              from={from}
-              to={to}
-              dayList={dayList}
-              items={visible.filter((it) => it.slot === slot)}
-              onSelectItem={onSelectItem}
-              onSelectDay={onSelectDay}
-            />
-          ))}
+          <TimelineLane
+            row={2}
+            today={today}
+            from={from}
+            to={to}
+            dayList={dayList}
+            items={visible}
+            onSelectItem={onSelectItem}
+            onSelectDay={onSelectDay}
+          />
         </div>
       </div>
     </div>
@@ -486,7 +438,6 @@ export function PlacementTimeline({
 }
 
 function TimelineLane({
-  slot,
   row,
   today,
   from,
@@ -496,7 +447,6 @@ function TimelineLane({
   onSelectItem,
   onSelectDay,
 }: {
-  slot: PlacementSlot
   row: number
   today: string
   from: string
@@ -504,13 +454,12 @@ function TimelineLane({
   dayList: string[]
   items: TimelineItem[]
   onSelectItem?: (item: TimelineItem) => void
-  onSelectDay?: (slot: PlacementSlot, day: string) => void
+  onSelectDay?: (day: string) => void
 }) {
   return (
     <>
       <div className="db-timeline__lane" style={{ gridRow: row, gridColumn: 1 }}>
-        <SlotBadge slot={slot} withLabel={false} />
-        <span>{slot}</span>
+        <HomepageBadge />
       </div>
       {dayList.map((d, i) => {
         const free = d >= today && !items.some((it) => it.starts_on <= d && (it.ends_on === null || it.ends_on >= d))
@@ -521,8 +470,8 @@ function TimelineLane({
             type="button"
             className={`${cls} is-free`}
             style={{ gridRow: row, gridColumn: i + 2 }}
-            onClick={() => onSelectDay(slot, d)}
-            aria-label={`Naplánovat na ${SLOT_NAMES[slot].toLowerCase()} od ${formatDay(d)}`}
+            onClick={() => onSelectDay(d)}
+            aria-label={`Naplánovat od ${formatDay(d)}`}
           >
             +
           </button>

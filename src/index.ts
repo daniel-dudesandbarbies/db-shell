@@ -18,12 +18,11 @@ export { BackIcon } from './BackIcon'
 export { Select } from './Select'
 export type { SelectOption, SelectProps } from './Select'
 export {
-  SlotBadge,
+  HomepageBadge,
   DateRangeFields,
   PlacementForm,
   PlacementTimeline,
   PlacementConflictError,
-  SLOT_NAMES,
   addDays,
   daysBetween,
   startOfWeek,
