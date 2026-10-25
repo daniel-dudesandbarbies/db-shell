@@ -723,6 +723,10 @@ body {
 .db-select__option.is-selected {
   font-weight: 800;
 }
+.db-select__option.is-muted,
+.db-select__value.is-muted {
+  color: var(--db-color-muted);
+}
 .db-select__option[aria-disabled='true'] {
   opacity: 0.45;
   cursor: default;

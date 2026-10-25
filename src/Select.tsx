@@ -5,6 +5,8 @@ export interface SelectOption {
   value: string
   label: string
   disabled?: boolean
+  /** Volitelná, ale vizuálně potlačená (např. člověk, který se ještě nepřihlásil). */
+  muted?: boolean
 }
 
 export interface SelectProps {
@@ -232,7 +234,7 @@ export function Select({
         onClick={() => (open ? close() : openList())}
         onKeyDown={onTriggerKey}
       >
-        <span className={`db-select__value${selected ? '' : ' is-placeholder'}`}>{selected ? selected.label : placeholder}</span>
+        <span className={`db-select__value${selected ? '' : ' is-placeholder'}${selected?.muted ? ' is-muted' : ''}`}>{selected ? selected.label : placeholder}</span>
         <span className="db-select__chevron" aria-hidden>
           <svg width="12" height="12" viewBox="0 0 12 12">
             <path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -280,7 +282,7 @@ export function Select({
                   role="option"
                   aria-selected={o.value === value}
                   aria-disabled={o.disabled || undefined}
-                  className={`db-select__option${i === active ? ' is-active' : ''}${o.value === value ? ' is-selected' : ''}`}
+                  className={`db-select__option${i === active ? ' is-active' : ''}${o.value === value ? ' is-selected' : ''}${o.muted ? ' is-muted' : ''}`}
                   onPointerMove={() => !o.disabled && i !== active && setActive(i)}
                   onClick={() => choose(o)}
                 >
