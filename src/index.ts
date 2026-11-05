@@ -16,6 +16,8 @@ export { useDismiss } from './useDismiss'
 export { StatusScreen } from './StatusScreen'
 export { BackIcon } from './BackIcon'
 export { Select } from './Select'
+export { confirmDialog } from './ConfirmDialog'
+export type { ConfirmOptions } from './ConfirmDialog'
 export type { SelectOption, SelectProps } from './Select'
 export {
   HomepageBadge,
