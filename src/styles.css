@@ -113,6 +113,7 @@ body {
 .db-appheader__logo {
   margin-right: auto;
   display: flex;
+  flex-shrink: 0;
 }
 .db-appheader__logo img {
   display: block;
@@ -122,6 +123,7 @@ body {
 .db-appheader__nav {
   display: flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 .db-appheader__nav a {
   padding: 8px 16px;
@@ -135,12 +137,27 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-decoration: none;
+  /* Tlačítka se nikdy nezalamují do dvou řádků (mění to vzhled lišty). */
+  white-space: nowrap;
   transition: background 0.2s ease, color 0.2s ease;
 }
 .db-appheader__nav a:hover,
 .db-appheader__nav a.is-active {
   background: #fff;
   color: var(--db-color-brand);
+}
+/* Těsně nad hranicí mobilu (bubliny) se lišta musí vejít na jeden řádek -
+   menší mezery a užší tlačítka. */
+@media (min-width: 900px) and (max-width: 1099px) {
+  .db-appheader__inner {
+    gap: 14px;
+  }
+  .db-appheader__nav {
+    gap: 4px;
+  }
+  .db-appheader__nav a {
+    padding-inline: 12px;
+  }
 }
 @media (max-width: 899px) {
   .db-appheader__nav {
