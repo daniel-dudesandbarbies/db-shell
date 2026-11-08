@@ -1,6 +1,7 @@
 import { AccountMenu, type AccountMenuProps } from './AccountMenu'
 import { FloatingMenu } from './FloatingMenu'
 import { HomeIcon } from './HomeIcon'
+import { NavPills } from './NavPills'
 import type { NavItem } from './internalPlatformNav'
 
 export interface AppHeaderProps {
@@ -31,30 +32,20 @@ export function AppHeader({ logoHref, logoSrc, navItems, account, homeHref, home
           <a className="db-appheader__logo" href={logoHref}>
             <img src={logoSrc} alt="Dudes & Barbies" />
           </a>
-          {/* Domů - vždy vidět, i na telefonu (pilulky jsou tam v bublině). */}
-          <a
-            className={`db-appheader__home${homeActive ? ' is-active' : ''}`}
-            href={homeHref ?? logoHref}
-            aria-label="Domů"
-            title="Domů"
-            aria-current={homeActive ? 'page' : undefined}
-          >
-            <HomeIcon />
-          </a>
-          {navItems.length > 0 && (
-            <nav className="db-appheader__nav" aria-label="Navigace">
-              {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={item.active ? 'is-active' : undefined}
-                  aria-current={item.active ? 'page' : undefined}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-          )}
+          {/* Domů - vždy vidět, i na telefonu (pilulky jsou tam v bublině).
+              Domeček a pilulky jsou spolu vpravo; co se nevejde, je pod „…“. */}
+          <div className="db-appheader__right">
+            <a
+              className={`db-appheader__home${homeActive ? ' is-active' : ''}`}
+              href={homeHref ?? logoHref}
+              aria-label="Domů"
+              title="Domů"
+              aria-current={homeActive ? 'page' : undefined}
+            >
+              <HomeIcon />
+            </a>
+            {navItems.length > 0 && <NavPills items={navItems} />}
+          </div>
           <AccountMenu {...account} />
         </div>
       </header>

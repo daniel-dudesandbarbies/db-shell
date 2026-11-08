@@ -125,6 +125,85 @@ body {
   gap: 6px;
   flex-shrink: 0;
 }
+/* Domeček + pilulky: zabírá místo mezi logem a avatarem, obsah vpravo. */
+.db-appheader__right {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+/* Místo pro pilulky - jeho šířku měří NavPills. */
+.db-appheader__navfit {
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  gap: 6px;
+}
+/* Neviditelná kopie všech pilulek jen pro změření šířek. */
+.db-appheader__nav--measure {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+.db-appheader__more {
+  position: relative;
+  display: flex;
+}
+.db-appheader__more-btn,
+.db-appheader__more-btn:hover:not(:disabled) {
+  width: 40px;
+  height: 40px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.db-appheader__more-btn:hover:not(:disabled),
+.db-appheader__more-btn[aria-expanded='true'] {
+  background: #fff;
+  color: var(--db-color-brand);
+}
+.db-appheader__more-panel {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  z-index: 800;
+  min-width: 200px;
+  background: #fff;
+  border-radius: var(--db-radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.db-appheader__more-panel a {
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--db-color-brand);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.db-appheader__more-panel a:hover,
+.db-appheader__more-panel a[aria-current='page'] {
+  background: rgba(var(--db-color-brand-rgb), 0.08);
+}
 .db-appheader__nav a {
   padding: 8px 16px;
   border-radius: var(--db-radius-pill);
@@ -146,21 +225,8 @@ body {
   background: #fff;
   color: var(--db-color-brand);
 }
-/* Těsně nad hranicí mobilu (bubliny) se lišta musí vejít na jeden řádek -
-   menší mezery a užší tlačítka. */
-@media (min-width: 900px) and (max-width: 1099px) {
-  .db-appheader__inner {
-    gap: 14px;
-  }
-  .db-appheader__nav {
-    gap: 4px;
-  }
-  .db-appheader__nav a {
-    padding-inline: 12px;
-  }
-}
 @media (max-width: 899px) {
-  .db-appheader__nav {
+  .db-appheader__navfit {
     display: none;
   }
   .db-appheader__inner {
@@ -487,10 +553,6 @@ body {
 .db-appheader__home.is-active {
   background: #fff;
   color: var(--db-color-brand);
-}
-/* Logo vlevo odsune zbytek doprava - domeček, pilulky a avatar těsně u sebe. */
-.db-appheader__inner > .db-appheader__home {
-  margin-right: -12px;
 }
 .db-status__btn {
   display: inline-flex;
